@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { Form, Input, Select, Button, message } from 'antd';
+import { HomeOutlined, BookOutlined, LockOutlined, ProjectOutlined, UserOutlined, QuestionCircleOutlined } from '@ant-design/icons';
+import "./Dashboard.css";
 
 import "./Dashboard.css";
 
@@ -56,36 +58,33 @@ const LockerDashboard = () => {
         <div className="flex h-screen">
             {/* Sidebar */}
             <aside
-                className={`w-1/5 bg-gray-100 p-4 fixed h-full transform ${isMenuVisible ? "translate-x-0" : "-translate-x-full"
-                    } transition-transform duration-300`}
+                className={`w-1/5 bg-gray-100 p-4 fixed h-full transform ${isMenuVisible ? "translate-x-0" : "-translate-x-full"} transition-transform duration-300`}
             >
-                <h5 className="font-bold text-lg mb-6">myLocker Dashboard</h5>
+                <h5 className="font-bold text-lg mb-6 flex items-center">
+                    <HomeOutlined className="mr-2" />
+                    myLocker Dashboard
+                </h5>
                 <ul className="space-y-3">
-                    <li className="font-medium text-gray-700">
-                        <a href="#" className="hover:text-blue-600">
-                            Work
-                        </a>
+                    <li className="font-medium text-gray-700 flex items-center">
+                        <BookOutlined className="mr-2" />
+                        <a href="#" className="hover:text-blue-600">Mainpage</a>
                     </li>
-                    <li className="font-medium text-gray-700">
-                        <a href="#" className="hover:text-blue-600">
-                            Form Portal
-                        </a>
-                        <ul className="pl-4 space-y-2 text-gray-500">
-                            <li>
-                                <a href="#" className="hover:text-blue-600">Forms</a>
-                            </li>
-                            <li>
-                                <a href="#" className="hover:text-blue-600">Group</a>
-                            </li>
-                            <li>
-                                <a href="#" className="hover:text-blue-600">Provider</a>
-                            </li>
-                            <li>
-                                <a href="#" className="hover:text-blue-600">Quick Action</a>
-                            </li>
-                        </ul>
+                    <li className="font-medium text-gray-700 flex items-center">
+                        <LockOutlined className="mr-2" />
+                        <a href="#" className="hover:text-blue-600">Locker</a>
                     </li>
-                    {/* Other menu items */}
+                    <li className="font-medium text-gray-700 flex items-center">
+                        <ProjectOutlined className="mr-2" />
+                        <a href="#" className="hover:text-blue-600">Project</a>
+                    </li>
+                    <li className="font-medium text-gray-700 flex items-center">
+                        <UserOutlined className="mr-2" />
+                        <a href="#" className="hover:text-blue-600">User</a>
+                    </li>
+                    <li className="font-medium text-gray-700 flex items-center">
+                        <QuestionCircleOutlined className="mr-2" />
+                        <a href="#" className="hover:text-blue-600">Help</a>
+                    </li>
                 </ul>
             </aside>
 
