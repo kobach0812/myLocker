@@ -6,9 +6,9 @@ import App from './App';
 
 const msalConfig = {
     auth: {
-        clientId: "cb601840-9701-44f0-9230-a0b86023bdfb", //  client ID
+        clientId: "42545bdf-ac52-4cbb-bdcc-07526ec228f7", //  client ID hoặc Application ID
         authority: "https://login.microsoftonline.com/a7380202-eb54-415a-9b66-4d9806cfab42", //  tenant ID
-        redirectUri: "http://localhost:3003",
+        redirectUri: "http://localhost:3000",
     }
 };
 

@@ -8,7 +8,7 @@ module.exports = {
       options: {
         lessLoaderOptions: {
           lessOptions: {
-            modifyVars: { '@primary-color': '#f15a22' }, // Update Ant Design primary color here
+            modifyVars: { '@primary-color': '#f15a22' }, 
             javascriptEnabled: true,
           },
         },
