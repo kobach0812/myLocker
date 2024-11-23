@@ -17,7 +17,7 @@ const Login = () => {
 
         if (user && user.password === values.password) {
             message.success('Login successful');
-            navigate('/home');
+            navigate('/dashboard');
         } else {
             message.error('Sign-in failed');
         }
@@ -28,7 +28,7 @@ const Login = () => {
         instance.loginPopup({ scopes: ["user.read"], prompt: "select_account" })
             .then(() => {
                 message.success('Login with Office 365 successful');
-                navigate('/home');
+                navigate('/dashboard');
             })
             .catch(err => {
                 console.error('Office 365 Login Error:', err);
