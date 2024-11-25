@@ -27,7 +27,13 @@ const LockerDashboard = () => {
         return sampleData;
     };
 
-    const sampleData = generateData();
+    //const sampleData = generateData();
+    const sampleData = [
+        { id: 1, status: "Opened", lastOpen: null, lastLock: null, user: null, location: "Location A", history: [] },
+        { id: 2, status: "Opened", lastOpen: null, lastLock: null, user: null, location: "Location B", history: [] },
+        // Add more rows as needed
+    ];
+    
 
     // Pagination Logic
     const [currentPage, setCurrentPage] = useState(1);
@@ -63,6 +69,23 @@ const LockerDashboard = () => {
         </Menu>
     );
 
+    //Create the modal for history
+    const [selectedLocker, setSelectedLocker] = useState(null);
+    const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
+
+    // Function to open the modal
+    const handleHistoryClick = (locker) => {
+        setSelectedLocker(locker);
+        setIsHistoryModalOpen(true);
+    };
+
+    // Function to close the modal
+    const closeModal = () => {
+        setSelectedLocker(null);
+        setIsHistoryModalOpen(false);
+    };
+
+
     // State for button and status interaction
     const [buttonState, setButtonState] = useState({});
     const [data, setData] = useState(sampleData);
@@ -70,6 +93,8 @@ const LockerDashboard = () => {
     const handleButtonClick = (id, action) => {
         const updatedData = [...data]; // Clone the data state
         const rowIndex = updatedData.findIndex((row) => row.id === id);
+        const locker = updatedData[rowIndex];
+        const timestamp = new Date().toLocaleString();
     
         if (rowIndex === -1) {
             console.error(`Row with ID ${id} not found.`);
@@ -79,31 +104,42 @@ const LockerDashboard = () => {
         // Get the current timestamp
         const currentTime = new Date().toLocaleString();
     
-        // Update the status and timestamp based on the action
+        // Simulate the current user
+        const currentUser = "Current User"; // Replace with actual user info if available
+    
+        // Update the status, timestamps, and user based on the action
         switch (action) {
             case "lock":
                 updatedData[rowIndex].status = "Locked";
+                updatedData[rowIndex].lastLock = currentTime;
+                updatedData[rowIndex].user = currentUser;
                 break;
             case "unlock":
                 updatedData[rowIndex].status = "Opened";
+                updatedData[rowIndex].lastOpen = currentTime;
+                updatedData[rowIndex].user = currentUser;
                 break;
             case "release":
                 updatedData[rowIndex].status = "Released";
+                updatedData[rowIndex].user = ""; // Clear user on release
                 break;
             default:
                 console.error(`Invalid action: ${action}`);
                 return;
         }
     
-        updatedData[rowIndex].timestamp = currentTime;
-    
-        // Update the button state and data
+        // Update button state and data
         setButtonState((prevState) => ({
             ...prevState,
             [id]: action,
         }));
+
+        // Add the action to the history
+        locker.history.push({ action, timestamp });
+
+        //Update state
         setData(updatedData);
-    };
+    };    
     
 
     //action button
@@ -117,7 +153,7 @@ const LockerDashboard = () => {
         >
             {label}
         </button>
-    );
+    );  
     
     const [isMenuVisible, setIsMenuVisible] = useState(false)
 
@@ -201,20 +237,25 @@ const LockerDashboard = () => {
                     </div>
 
                 {/* Table Section */}
-                <table className="w-full text-left border-collapse">
+                <div className="table-section bg-gray p-4 shadow rounded-md">
+                <table className="w-full text-center border-collapse border border-gray-300">
     <thead>
-        <tr>
-            <th>ID</th>
-            <th>Status</th>
-            <th>Last Updated</th>
-            <th>Actions</th>
+        <tr className="bg-gray-100">
+            <th className="px-4 py-2 border border-gray-300">ID</th>
+            <th className="px-4 py-2 border border-gray-300">Status</th>
+            <th className="px-4 py-2 border border-gray-300">Last Open</th>
+            <th className="px-4 py-2 border border-gray-300">Last Lock</th>
+            <th className="px-4 py-2 border border-gray-300">User</th>
+            <th className="border border-gray-300 px-4 py-2">Location</th>
+            <th className="px-4 py-2 border border-gray-300">Actions</th>
+            <th className="px-4 py-2 border border-gray-300">History</th>
         </tr>
     </thead>
     <tbody>
         {data.map((row) => (
-            <tr key={row.id}>
-                <td>{row.id}</td>
-                <td>
+            <tr key={row.id} className="hover:bg-gray-50">
+                <td className="px-4 py-2 border border-gray-300">{row.id}</td>
+                <td className="px-4 py-2 border border-gray-300">
                     <span
                         className={`px-2 py-1 rounded text-white ${
                             row.status === "Locked"
@@ -227,8 +268,11 @@ const LockerDashboard = () => {
                         {row.status}
                     </span>
                 </td>
-                <td>{row.timestamp || "Not Updated"}</td> {/* Display timestamp */}
-                <td>
+                <td className="px-4 py-2 border border-gray-300">{row.lastOpen || "Never Opened"}</td>
+                <td className="px-4 py-2 border border-gray-300">{row.lastLock || "Never Locked"}</td>
+                <td className="px-4 py-2 border border-gray-300">{row.user || "No User"}</td>
+                <td className="border border-gray-300 px-4 py-2">{row.location}</td>
+                <td className="px-4 py-2 border border-gray-300">
                     <button
                         onClick={() => handleButtonClick(row.id, "lock")}
                         className={`${
@@ -251,85 +295,57 @@ const LockerDashboard = () => {
                             buttonState[row.id] === "release" ? "font-bold text-blue-600" : "text-gray-600"
                         } bg-gray-200 px-2 py-1 rounded hover:bg-gray-300`}
                     >
+                    </button>
+                    <button
+                        onClick={() => handleButtonClick(row.id, "release")}
+                        className={`${
+                            buttonState[row.id] === "release" ? "font-bold text-blue-600" : "text-gray-600"
+                        } bg-gray-200 px-2 py-1 rounded hover:bg-gray-300`}
+                    >
                         Release
+                    </button>
+                    </td>
+                    <td className="px-4 py-2 border border-gray-300">
+                    <button
+                        onClick={() => handleHistoryClick(row)}
+                        className="text-blue-500 hover:underline"
+                    >
+                        History
                     </button>
                 </td>
             </tr>
         ))}
     </tbody>
 </table>
+    {isHistoryModalOpen && selectedLocker && (
+        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white w-1/3 p-6 rounded-lg shadow-lg relative">
+                <button
+                    onClick={closeModal}
+                    className="absolute top-2 right-2 text-gray-600 hover:text-black"
+                >
+                    &times;
+                </button>
+                <h2 className="text-lg font-bold mb-4">
+                    Locker History (ID: {selectedLocker.id})
+                </h2>
+                {selectedLocker.history && selectedLocker.history.length > 0 ? (
+                    <ul className="list-disc list-inside">
+                        {selectedLocker.history.map((entry, index) => (
+                            <li key={index}>
+                                <span className="font-semibold">{entry.action}</span> at {entry.timestamp}
+                            </li>
+                        ))}
+                    </ul>
+                ) : (
+                    <p className="text-gray-500">No history available.</p>
+                )}
+            </div>
+        </div>
+    )}
+</div>
 
                 <div className="table-section bg-gray p-4 shadow rounded-md">
-                    <table className="w-full text-left border-collapse border border-gray-300">
-                        <thead className="bg-gray-100 text-gray-700">
-                            <tr>
-                                <th className="border border-gray-300 px-4 py-2">ID</th>
-                                <th className="border border-gray-300 px-4 py-2">Date Open</th>
-                                <th className="border border-gray-300 px-4 py-2">Date Lock</th>
-                                <th className="border border-gray-300 px-4 py-2">Status</th>
-                                <th className="border border-gray-300 px-4 py-2">Owner</th>
-                                <th className="border border-gray-300 px-4 py-2">Location</th>
-                                <th className="border border-gray-300 px-4 py-2">Setting</th>
-                            </tr>
-                        </thead>
-                        <tbody className="text-sm">
-                            {getCurrentPageData().map((row) => (
-                                <tr
-                                    key={row.id}
-                                    className="odd:bg-white even:bg-gray-50 hover:bg-gray-100"
-                                >
-                                    <td className="border border-gray-300 px-4 py-2">{row.id}</td>
-                                    <td className="border border-gray-300 px-4 py-2">{row.open}</td>
-                                    <td className="border border-gray-300 px-4 py-2">{row.lock}</td>
-                                    <td className="border border-gray-300 px-4 py-2">
-                            <span
-                                className={`px-2 py-1 rounded text-white ${
-                                    row.status === "Locked"
-                                    ? "bg-red-500"
-                                    : row.status === "Opened"
-                                    ? "bg-green-500"
-                                    : "bg-gray-500"
-                                }`}
-                            >
-                                {row.status}
-                            </span>
-                        </td>
-                                    <td className="border border-gray-300 px-4 py-2">
-                                        {row.owner}
-                                    </td>
-                                    <td className="border border-gray-300 px-4 py-2">
-                                        {row.location}
-                                    </td>
-                                    <td className="border border-gray-300 px-4 py-2 flex justify-around">
-                                        <button
-                                            onClick={() => handleButtonClick(row.id, "lock")}
-                                            className={`bg-red-200 px-2 py-1 rounded hover:bg-red-300 ${
-                                                row.status === "Locked" ? "font-bold text-red-600" : "text-gray-600"
-                                            }`}
-                                        >
-                                        Lock
-                                            </button>
-                                            <button
-                                            onClick={() => handleButtonClick(row.id, "unlock")}
-                                            className={`bg-green-200 px-2 py-1 rounded hover:bg-green-300 ${
-                                                row.status === "Opened" ? "font-bold text-green-600" : "text-gray-600"
-                                            }`}
-                                            >
-                                        Open
-                                            </button>
-                                            <button
-                                            onClick={() => handleButtonClick(row.id, "release")}
-                                            className={`bg-gray-200 px-2 py-1 rounded hover:bg-gray-300 ${
-                                                row.status === "Released" ? "font-bold text-blue-600" : "text-gray-600"
-                                            }`}
-                                            >
-                                            Release
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
                     {/* Pagination */}
                     <div className="flex justify-center mt-6 space-x-2 mb-10">
                         {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
