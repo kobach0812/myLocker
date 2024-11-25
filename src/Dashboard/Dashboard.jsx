@@ -68,19 +68,18 @@ const LockerDashboard = () => {
     const [data, setData] = useState(sampleData);
 
     const handleButtonClick = (id, action) => {
-        // Make sure 'id' and 'action' are passed correctly
-        const updatedData = [...data];  // Clone the data state
-    
-        // Find the index of the row that needs to be updated
+        const updatedData = [...data]; // Clone the data state
         const rowIndex = updatedData.findIndex((row) => row.id === id);
     
-        // Ensure the row exists
         if (rowIndex === -1) {
             console.error(`Row with ID ${id} not found.`);
             return;
         }
     
-        // Update the status based on the action
+        // Get the current timestamp
+        const currentTime = new Date().toLocaleString();
+    
+        // Update the status and timestamp based on the action
         switch (action) {
             case "lock":
                 updatedData[rowIndex].status = "Locked";
@@ -96,15 +95,16 @@ const LockerDashboard = () => {
                 return;
         }
     
-        // Update the button styles
+        updatedData[rowIndex].timestamp = currentTime;
+    
+        // Update the button state and data
         setButtonState((prevState) => ({
             ...prevState,
-            [id]: action,  // Update the button state for the given row ID
+            [id]: action,
         }));
-    
-        // Update the data state
         setData(updatedData);
-    };    
+    };
+    
 
     //action button
     const ActionButton = ({ id, action, currentState, onClick, color, label }) => (
@@ -201,6 +201,64 @@ const LockerDashboard = () => {
                     </div>
 
                 {/* Table Section */}
+                <table className="w-full text-left border-collapse">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Status</th>
+            <th>Last Updated</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {data.map((row) => (
+            <tr key={row.id}>
+                <td>{row.id}</td>
+                <td>
+                    <span
+                        className={`px-2 py-1 rounded text-white ${
+                            row.status === "Locked"
+                                ? "bg-red-500"
+                                : row.status === "Opened"
+                                ? "bg-green-500"
+                                : "bg-gray-500"
+                        }`}
+                    >
+                        {row.status}
+                    </span>
+                </td>
+                <td>{row.timestamp || "Not Updated"}</td> {/* Display timestamp */}
+                <td>
+                    <button
+                        onClick={() => handleButtonClick(row.id, "lock")}
+                        className={`${
+                            buttonState[row.id] === "lock" ? "font-bold text-red-600" : "text-gray-600"
+                        } bg-red-200 px-2 py-1 rounded hover:bg-red-300`}
+                    >
+                        Lock
+                    </button>
+                    <button
+                        onClick={() => handleButtonClick(row.id, "unlock")}
+                        className={`${
+                            buttonState[row.id] === "unlock" ? "font-bold text-cyan-600" : "text-gray-600"
+                        } bg-green-200 px-2 py-1 rounded hover:bg-green-300`}
+                    >
+                        Open
+                    </button>
+                    <button
+                        onClick={() => handleButtonClick(row.id, "release")}
+                        className={`${
+                            buttonState[row.id] === "release" ? "font-bold text-blue-600" : "text-gray-600"
+                        } bg-gray-200 px-2 py-1 rounded hover:bg-gray-300`}
+                    >
+                        Release
+                    </button>
+                </td>
+            </tr>
+        ))}
+    </tbody>
+</table>
+
                 <div className="table-section bg-gray p-4 shadow rounded-md">
                     <table className="w-full text-left border-collapse border border-gray-300">
                         <thead className="bg-gray-100 text-gray-700">
